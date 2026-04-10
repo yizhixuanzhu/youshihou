@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMTI 大马榴莲人格测试 | 有石猴</title>
+    <style>
+        :root {
+            --primary: #FFD700; /* 高级明黄 */
+            --primary-dark: #E6C200; /* 深金 */
+            --bg-grad1: #FFFDF2; /* 渐变亮黄 */
+            --bg-grad2: #FFF5CC; /* 渐变暖黄 */
+            --text-main: #1A1A1A; /* 极致黑 */
+            --text-muted: #555555; /* 高级灰 */
+            --accent-green: #004D40; /* 极少量墨绿点缀 */
+        }
+        body {
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-grad1) 0%, var(--bg-grad2) 100%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            padding: 25px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 1; 
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { color: var(--text-main); font-size: 28px; font-weight: 900; margin: 5px 0; letter-spacing: 2px; }
+        .header p { color: var(--text-muted); font-weight: 600; font-size: 12px; margin: 0; letter-spacing: 3px; text-transform: uppercase; }
+        
+        .card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 30px 25px;
+            box-shadow: 0 15px 35px rgba(200, 150, 0, 0.08);
+            flex-grow: 1;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+            background: linear-gradient(90deg, #FFDF00, #D4AF37, #FFDF00);
+        }
+
+        .gallery-title { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px; font-weight: bold; letter-spacing: 1px; }
+        
+        .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+        .gallery-item { background: #FAFAFA; border: 1px solid #EBEBEB; border-radius: 16px; padding: 20px 10px; text-align: center; transition: all 0.3s; }
+        .gallery-item:hover { transform: translateY(-4px); border-color: var(--primary); background: #FFFDF5; box-shadow: 0 8px 15px rgba(255,215,0,0.15); }
+        .gallery-item img { width: 130px; height: 130px; object-fit: contain; margin-bottom: 12px; transition: transform 0.3s; }
+        .gallery-item:hover img { transform: scale(1.08); }
+        .gallery-item .name { font-size: 15px; font-weight: 900; color: var(--text-main); }
+        .gallery-item .tag { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+
+        .btn {
+            display: block; width: 100%; padding: 18px; margin: 12px 0;
+            background: var(--text-main); border: none; border-radius: 12px;
+            font-size: 16px; font-weight: bold; color: var(--primary); cursor: pointer;
+            transition: all 0.3s ease; letter-spacing: 1px;
+        }
+        .btn:hover { background: #333333; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        
+        .btn-option {
+            background: #FFFFFF; border: 2px solid #EBEBEB; color: var(--text-main);
+            text-align: left; font-weight: 500; letter-spacing: 0;
+        }
+        .btn-option:hover { 
+            background: var(--bg-grad1); border-color: var(--primary); 
+            color: var(--text-main); font-weight: bold; box-shadow: none; transform: translateX(5px);
+        }
+        .btn-prev { background: transparent; border: 1px solid #DDD; color: var(--text-muted); font-size: 13px; padding: 12px; margin-top: auto; }
+        .btn-prev:hover { background: #F5F5F5; transform: none; box-shadow: none; color: var(--text-main); border-color: #CCC; }
+        .hidden { display: none !important; }
+        
+        .progress-container { margin-bottom: 25px; text-align: center; display: flex; align-items: center; justify-content: center; flex-direction: column;}
+        
+        .progress-icon { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin-right: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .progress-text-wrapper { display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; color: var(--text-main); }
+        
+        .progress-bar { width: 100%; background: #F0F0F0; border-radius: 10px; height: 6px; margin-top: 15px; overflow: hidden; }
+        .progress-fill { background: linear-gradient(90deg, #FFDF00, #D4AF37); height: 100%; border-radius: 10px; width: 0%; transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        
+        /* ---------------- 加载页全屏科幻动效样式 ---------------- */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100vh;
+            background: #1A1A1A; 
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        #loading-screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        #nebulaCanvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+        .loading-content {
+            z-index: 2;
+            text-align: center;
+        }
+        .loading-content h3 {
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        .loading-content img {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            animation: pulse 1.5s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+            100% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+        }
+
+        .result-header { text-align: center; margin-bottom: 10px; }
+        .mascot-img { width: 220px; height: 220px; object-fit: contain; margin: 10px auto 20px auto; display: block; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.12)); }
+        
+        .result-title { font-size: 36px; font-weight: 900; color: var(--text-main); margin-bottom: 8px; letter-spacing: 2px; }
+        .result-tag { display: inline-block; font-size: 14px; font-weight: bold; color: var(--text-main); background: var(--primary); padding: 6px 18px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(255,215,0,0.3); }
+        
+        .radar-container { width: 100%; display: flex; justify-content: center; align-items: center; margin-bottom: 25px; }
+        /* 确保 canvas 在 CSS 层面尺寸固定，防止变形 */
+        #radarChart { width: 300px; height: 280px; } 
+
+        .result-desc-box { background: #FAFAFA; border-left: 4px solid var(--text-main); padding: 20px; margin-bottom: 20px; border-radius: 0 12px 12px 0; }
+        .result-desc { line-height: 1.9; font-size: 14px; color: var(--text-muted); text-align: justify; }
+        .result-advice { font-size: 13px; font-weight: bold; color: var(--accent-green); background: #F0F9F6; padding: 18px; border-radius: 12px; margin-bottom: 25px; line-height: 1.8; border: 1px solid rgba(0,77,64,0.1); }
+        
+        .brand { text-align: center; font-size: 11px; color: var(--text-muted); padding: 25px 0 10px 0; margin-top: auto; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div id="loading-screen">
+    <canvas id="nebulaCanvas"></canvas>
+    <div class="loading-content">
+        <img src="images/icon.jpg" alt="吉祥物">
+        <h3>正在深度扒皮，测算隐藏果格...</h3>
+        <div style="color: #AAA; font-size: 12px; letter-spacing: 1px;">算法绝对冷酷 · 结果绝对真实</div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h1>🐒 有石猴 SMTI</h1>
+        <p>Stone Monkey Durian Test</p>
+    </div>
+
+    <div id="home" class="card">
+        <h2 style="text-align: center; margin-bottom: 8px; color: var(--text-main); font-size: 24px; font-weight: 900;">揭秘你的隐藏果格</h2>
+        <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 30px; line-height: 1.6;">
+            放弃伪装吧。在顶级大马榴莲面前，<br>你灵魂深处的那点小心思根本藏不住。
+        </p>
+
+        <div class="gallery-title">全大马顶级阵列 · 8大人格图鉴</div>
+        <div class="gallery">
+            <div class="gallery-item"><img src="images/maoshanwang.png" alt="猫山王"><div class="name">猫山王</div><div class="tag">傲娇霸总</div></div>
+            <div class="gallery-item"><img src="images/heici.png" alt="黑刺"><div class="name">黑刺</div><div class="tag">隐秘守望者</div></div>
+            <div class="gallery-item"><img src="images/jinfeng.png" alt="金凤"><div class="name">金凤</div><div class="tag">极致白月光</div></div>
+            <div class="gallery-item"><img src="images/hongxia.png" alt="红虾"><div class="name">红虾</div><div class="tag">狂野显眼包</div></div>
+            <div class="gallery-item"><img src="images/zhuque.png" alt="朱雀"><div class="name">朱雀</div><div class="tag">绝版神秘客</div></div>
+            <div class="gallery-item"><img src="images/hulu.png" alt="葫芦"><div class="name">葫芦</div><div class="tag">微醺治愈系</div></div>
+            <div class="gallery-item"><img src="images/zhujiao.png" alt="竹脚"><div class="name">竹脚</div><div class="tag">硬核反骨仔</div></div>
+            <div class="gallery-item"><img src="images/xo.png" alt="XO"><div class="name">XO</div><div class="tag">颓废艺术家</div></div>
+        </div>
+        
+        <button class="btn" onclick="startTest()">🐒 开始扒皮 (共20题)</button>
+    </div>
+
+    <div id="quiz" class="card hidden">
+        <div class="progress-container">
+            <div class="progress-text-wrapper">
+                <img src="images/icon.jpg" alt="吉祥物" class="progress-icon">
+                <span id="progress-text">1 / 20</span>
+            </div>
+            <div class="progress-bar"><div id="progress" class="progress-fill"></div></div>
+        </div>
+        <h3 id="question-text" style="margin-bottom: 30px; color: var(--text-main); line-height: 1.6; font-size: 17px; font-weight: bold;"></h3>
+        <div id="options"></div>
+        <button id="btn-prev" class="btn btn-prev hidden" onclick="prevQuestion()">🔙 哎呀手滑啦！返回上一题</button>
+    </div>
+
+    <div id="result" class="card hidden">
+        <div class="result-header">
+            <div style="color: var(--text-muted); font-size: 12px; font-weight: bold; letter-spacing: 2px;">YOUR SMTI TYPE IS</div>
+            <div id="res-icon-container"></div>
+            <div id="res-name" class="result-title"></div>
+            <div id="res-tag" class="result-tag"></div>
+        </div>
+        
+        <div class="radar-container">
+            <canvas id="radarChart"></canvas>
+        </div>
+
+        <div class="result-desc-box">
+            <strong style="color: var(--text-main); font-size: 16px; display: block; margin-bottom: 10px; letter-spacing: 1px;">/// SMTI 深度果格报告：</strong>
+            <div id="res-desc" class="result-desc"></div>
+        </div>
+        
+        <div class="result-advice">
+            <strong style="color: var(--text-main); display: flex; align-items: center;">
+                <img src="images/icon.jpg" class="progress-icon" style="width: 24px; height: 24px; border-width: 1px;"> 
+                ✦ 有石猴的专属处方：
+            </strong><br>
+            <span id="res-advice" style="font-weight: normal; color: var(--text-muted);"></span>
+        </div>
+        
+        <button class="btn" onclick="alert('长按整个屏幕截屏，去朋友圈接受凡人们的朝拜吧！')">保存专属果格图谱</button>
+        <button class="btn" onclick="restart()" style="background: transparent; border: 2px solid var(--text-main); color: var(--text-main);">不服，我要重新投胎扒皮</button>
+    </div>
+
+    <div class="brand">有石猴，有石猴~ 宁愿选择榴莲不放手~ © 2026</div>
+</div>
+
+<script>
+    // ---------------- 全屏星云集聚科幻动效 ----------------
+    let nebulaAnimationId;
+    function initNebulaEffect() {
+        const canvas = document.getElementById('nebulaCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        let particles = [];
+        for (let i = 0; i < 400; i++) {
+            particles.push({
+                angle: Math.random() * Math.PI * 2,
+                dist: Math.random() * (canvas.width > canvas.height ? canvas.width : canvas.height),
+                speed: Math.random() * 0.02 + 0.005,
+                size: Math.random() * 2 + 0.5,
+                alpha: Math.random() * 0.8 + 0.2
+            });
+        }
+        
+        let startTime = Date.now();
+
+        function draw() {
+            let elapsed = Date.now() - startTime;
+            let progress = elapsed / 3500; 
+            
+            if (progress > 1) {
+                cancelAnimationFrame(nebulaAnimationId);
+                return;
+            }
+
+            ctx.fillStyle = 'rgba(26, 26, 26, 0.2)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            let centerX = canvas.width / 2;
+            let centerY = canvas.height / 2;
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+
+            for (let p of particles) {
+                p.angle += p.speed + progress * 0.1;
+                let currentDist = p.dist * (1 - Math.pow(progress, 1.5)); 
+
+                let x = Math.cos(p.angle) * currentDist;
+                let y = Math.sin(p.angle) * currentDist;
+
+                ctx.fillStyle = `rgba(255, 215, 0, ${p.alpha})`; 
+                ctx.beginPath();
+                ctx.arc(x, y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+
+            nebulaAnimationId = requestAnimationFrame(draw);
+        }
+        draw();
+    }
+    // ---------------- 粒子动效结束 ----------------
+
+
+    const questions = [
+        { text: "周末朋友叫你出去玩，你的第一反应是：", options: [
+            { text: "局够不够高端？谁买单？太low的局别叫我。", type: "BOSS" },
+            { text: "都有谁？必须确保没有我不喜欢的人在场。", type: "PURE" },
+            { text: "不去，在自己房间里躺着摆烂不香吗？", type: "CHILL" },
+            { text: "表面问去哪，心里已经开始疯狂编造不去的借口。", type: "DARK" }
+        ]},
+        { text: "深夜突然感到极其强烈的精神内耗和空虚，你的首选发泄方式是：", options: [
+            { text: "打开软件，霸气下单一份极其昂贵的礼物狠狠犒劳自己。", type: "BOSS" },
+            { text: "戴上耳机听重金属，或者去楼下疯狂夜跑宣泄体力。", type: "REBEL" },
+            { text: "翻出塔罗牌、星盘或者星座运势，试图用玄学寻找答案。", type: "RARE" },
+            { text: "立刻编辑一条极具深意的网抑云文案发朋友圈，等别人点赞。", type: "SHOW" }
+        ]},
+        { text: "路上遇到讨厌的人跟你打招呼，你会：", options: [
+            { text: "保持体面，微微点头", type: "PURE" },
+            { text: "假装没看见，疯狂低头滑手机装忙，主打一个无视。", type: "DARK" },
+            { text: "毫不掩饰地翻个白眼，用极其轻蔑的眼神杀死对方。", type: "REBEL" },
+            { text: "温和地笑笑应付过去，但心里已经暗骂了一万遍。", type: "HEAL" }
+        ]},
+        { text: "在公司或学校的群聊里，你的常态是：", options: [
+            { text: "发号施令，总结陈词，永远是那个一锤定音的控场者。", type: "BOSS" },
+            { text: "万年潜水器，暗中观察，默默搜集所有人的愚蠢发言。", type: "DARK" },
+            { text: "永远的捧场王和知心大姐/大哥，害怕任何人的话掉在地上。", type: "HEAL" },
+            { text: "群聊终结者或表情包大户，没我在这个群就毫无灵魂。", type: "SHOW" }
+        ]},
+        { text: "发现别人在背后八卦你，你的态度是：", options: [
+            { text: "议论我？说明我红呗。", type: "SHOW" },
+            { text: "无所谓，随他们去说，一群lowb。", type: "CHILL" },
+            { text: "觉得很好笑，有时候这种荒诞的流言反而让我觉得很酷。", type: "RARE" },
+            { text: "绝对不忍！当面怼回去大吵一架，看谁声音大！", type: "REBEL" }
+        ]},
+        { text: "你的日常消费观主打一个：", options: [
+            { text: "宁缺毋滥的极简主义，只买精而美的小众孤品。", type: "PURE" },
+            { text: "今天开心买买买，明天吃土我不管。", type: "CHILL" },
+            { text: "只要包装够骚气、能发朋友圈，就算是智商税我也交！", type: "SHOW" },
+            { text: "只买贵的，不买对的，价格就是衡量价值的唯一标准。", type: "BOSS" }
+        ]},
+        { text: "吃自助餐的时候，你的核心策略是：", options: [
+            { text: "直奔海鲜和最贵的肉，带着吃跨餐厅的杀气，吃不回本绝不走。", type: "BOSS" },
+            { text: "慢条斯理只挑精致、自己喜欢的食物。", type: "PURE" },
+            { text: "拿一堆甜品和碳水，吃一点就饱了，然后开始放空发呆。", type: "HEAL" },
+            { text: "专挑一些名字极其奇怪、没人认识的奇葩食材尝试。", type: "RARE" }
+        ]},
+        { text: "闹钟响了但你还极其困倦，你会：", options: [
+            { text: "靠着钢铁般的意志力弹射起步，绝不容许自己堕落。", type: "BOSS" },
+            { text: "按掉闹钟，在脑海里用一分钟迅速演练请假辞职的一生。", type: "DARK" },
+            { text: "疯狂拍打闹钟，带着巨大的怨恨和起床气爬起来骂骂咧咧。", type: "REBEL" },
+            { text: "无情关掉，大不了迟到被扣钱，没有什么比命和睡眠更重要。", type: "CHILL" }
+        ]},
+        { text: "出去旅游发现行李箱丢了，你的第一反应：", options: [
+            { text: "立刻连拍三张绝望自拍发社交软件：‘家人们谁懂啊！’", type: "SHOW" },
+            { text: "毫无波澜，直接去高端商场从头到脚买一套新的顶级装备。", type: "PURE" },
+            { text: "崩溃十分钟，然后自我安慰就当是宇宙安排的断舍离了。", type: "HEAL" },
+            { text: "觉得极其刺激，刚好可以体验一把原始人流浪的剧本杀。", type: "RARE" }
+        ]},
+        { text: "发朋友圈前后的心理活动通常是：", options: [
+            { text: "发完立刻自己点个赞，然后每秒刷新看谁给我评论了。", type: "SHOW" },
+            { text: "极其严谨地设置分组可见，生怕被哪怕一个不该看的人看到。", type: "DARK" },
+            { text: "基本不发，或者只发仅自己可见的深夜矫情emo文案。", type: "HEAL" },
+            { text: "毫无包袱，想发什么废话就发什么，纯粹为了记录神经日常。", type: "CHILL" }
+        ]},
+        { text: "和朋友发生极其严重的争执时，你会：", options: [
+            { text: "用极其严密的逻辑和压倒性的气场驳倒对方，必须证明我才是对的。", type: "BOSS" },
+            { text: "开启终极冷暴力，直接删好友，从此老死不相往来。", type: "DARK" },
+            { text: "放弃逻辑，主打一个声压制胜和情绪输出，先发疯再说。", type: "REBEL" },
+            { text: "长叹一口气，算了吧，懒得吵，各自安好互不打扰。", type: "CHILL" }
+        ]},
+        { text: "大家一起点外卖，但口味众口难调，你会：", options: [
+            { text: "直接拍板决定吃什么，不服的人可以自己去吃空气。", type: "BOSS" },
+            { text: "极其头铁地坚持要点自己喜欢的那家，哪怕没人陪我拼单。", type: "REBEL" },
+            { text: "主动退让，吃什么都行，最怕大家因为这点小事气氛尴尬。", type: "HEAL" },
+            { text: "提议点个都没吃过的诡异小店，主打猎奇。", type: "RARE" }
+        ]},
+        { text: "在路上看到一只超级可爱的狗狗，你会：", options: [
+            { text: "保持体面优雅的微笑，内心狂喜但绝对克制住不上前。", type: "PURE" },
+            { text: "立刻夹起嗓子发出不可名状的怪叫，冲上去疯狂抚摸求合影。", type: "SHOW" },
+            { text: "站得远远的冷眼旁观，既怕狗咬人，又嫌狗主人难搞。", type: "DARK" },
+            { text: "默默蹲在两米外看着它，感觉自己千疮百孔的灵魂被治愈了。", type: "HEAL" }
+        ]},
+        { text: "你最喜欢的电影类型或看电影的状态是：", options: [
+            { text: "拿过国际大奖的晦涩小众文艺片，看完必须在豆瓣写长篇影评。", type: "PURE" },
+            { text: "烧脑悬疑片，并享受在心里嘲笑主角和编剧智商的优越感。", type: "DARK" },
+            { text: "只看无脑爆米花喜剧，而且要在影院里笑得最大声。", type: "SHOW" },
+            { text: "极度烧脑的科幻片或神话片，就喜欢那种看不懂的玄学感。", type: "RARE" }
+        ]},
+        { text: "排队买东西时，有人明目张胆地插队，你会：", options: [
+            { text: "大声呵斥，甚至拿起手机录像维权，化身正义使者替天行道！", type: "REBEL" },
+            { text: "用极其犀利且不带脏字的语言冷嘲热讽，让他无地自容。", type: "BOSS" },
+            { text: "表示不屑，但算了吧算了吧，不采取任何行动。", type: "HEAL" },
+            { text: "顺水推舟，自己也悄悄往前挪两步，试图跟着浑水摸鱼。", type: "CHILL" }
+        ]},
+        { text: "过生日收到了一份极其丑陋且廉价的礼物，你会：", options: [
+            { text: "当面保持完美的商业假笑连说谢谢，转头放进储物间吃灰。", type: "PURE" },
+            { text: "毫无掩饰地直接表现出嫌弃：‘你到底在想什么送我这破烂？’", type: "REBEL" },
+            { text: "立刻穿上/戴上这个丑东西，满屋子乱跑甚至拍照发朋友圈逗大家笑。", type: "SHOW" },
+            { text: "无脑收下，反正是白嫖的。", type: "CHILL" }
+        ]},
+        { text: "你的办公桌/书桌的日常状态是：", options: [
+            { text: "变态级别的极简主义，一丝不苟，所有物品呈90度完美直角摆放。", type: "BOSS" },
+            { text: "摆满了各种手办、解压玩具和毫无用处的可爱小垃圾，像个祭坛。", type: "SHOW" },
+            { text: "乱中有序的废墟，别人看一眼就崩溃，但我闭着眼就能摸到东西。", type: "CHILL" },
+            { text: "经常毫无理由地变换布局，每次看到都以为换了个工位。", type: "RARE" }
+        ]},
+        { text: "去KTV唱歌，你的常态是：", options: [
+            { text: "绝对的麦霸，哪怕全损音质也要唱完整场，还要逼着别人伴舞。", type: "SHOW" },
+            { text: "永远缩在角落里吃果盘、玩手机、帮忙点歌的隐形幽灵。", type: "DARK" },
+            { text: "专门点极其难听的网络神曲，带头在包厢里群魔乱舞。", type: "REBEL" },
+            { text: "只唱几首安静伤感的情歌，然后就在沙发上毫无防备地睡着了。", type: "HEAL" }
+        ]},
+        { text: "如果人生是一个游戏，你觉得你的终极通关策略是：", options: [
+            { text: "疯狂氪金，用绝对的资本和实力碾压所有可怜的NPC。", type: "BOSS" },
+            { text: "不停地找漏洞卡Bug，绝不走寻常路，主打一个反叛规则。", type: "REBEL" },
+            { text: "疯狂作死尝试所有奇葩死亡选项，根本不在乎输赢只求玄学。", type: "RARE" },
+            { text: "找个风景绝美的地方挂机，能不打怪就不打怪，躺平即胜利。", type: "CHILL" }
+        ]},
+        { text: "最后一道直击灵魂的题：你觉得自己到底是个什么样的人？", options: [
+            { text: "一个脱离了低级趣味，极其尊贵且不可替代的上位者。", type: "BOSS" },
+            { text: "一个早已看透世俗愚蠢、懒得解释的孤独高级观察家。", type: "DARK" },
+            { text: "一个精神状态遥遥领先地球人几百年的绝版神经病。", type: "RARE" },
+            { text: "一个每天都在深夜emo和白天治愈之间反复横跳的烂好人。", type: "HEAL" }
+        ]}
+    ];
+
+    const resultsData = {
+        BOSS: {
+            name: "猫山王", tag: "CTRL (傲娇霸总)", imgSrc: "images/maoshanwang.png", stats: [95, 30, 60, 10, 50],
+            desc: "你就是大马榴莲界当之无愧的西装暴徒，那明黄色的果肉里流淌的不是果汁，而是纯度极高的控制欲。作为不容置疑的老大哥，你有着极其自洽且无可救药的迷之自信，骨子里认为全天下的人都该朝拜你的品味与决断。在职场或社交圈中，你永远试图占据主导权，如果一个局不是你攒的或者不由你拍板，那你宁可不去。你的毒舌和偶露的微苦底味，往往让人觉得难以亲近，但这恰恰是你用来筛选凡人、“身价不菲”的阶级证明。你不是在发号施令，就是在去发号施令的路上，你的人生BGM永远是一首激昂的战歌。",
+            advice: "暂缓你称霸地球的计划吧！偶尔吃点平价外卖、承认自己也会犯错并不会让你掉价。整天端着霸总的架子不累吗？收起你那套控制欲，否则小心被周围人孤立，甚至被当成传销头目抓起来。"
+        },
+        DARK: {
+            name: "黑刺", tag: "DARK (隐秘守望者)", imgSrc: "images/heici.png", stats: [70, 95, 10, 30, 80],
+            desc: "你是榴莲界最危险也最昂贵的超级刺客。表面极其高冷、生人勿近，但你的内心却如同一个精密运转的量子云计算机，无时无刻不在分析周围的一切。稀有、昂贵、阴阳怪气是你最贴切的标签。你极其厌恶无效社交，从来不主动迎合大众，只在暗处静静等待那些愿意为你倾家荡产且“懂行”的冤大头。你患有严重的智性恋和完美主义，总觉得身边的人太蠢，但其实别人也觉得你是个极度难搞的怪胎。你擅长不动声色的冷暴力，记忆力惊人，你的死亡小本本上记录了所有得罪过你的人的每一个细节。",
+            advice: "试着和地球上真实的活人交流吧，不要只和自己的影子或高维度的空气对话。太贵又太孤僻，真的很像具有反社会倾向的高智商反派。偶尔下凡沾点烟火气，世界并没你想象的那么蠢。"
+        },
+        PURE: {
+            name: "金凤", tag: "PURE (极致白月光)", imgSrc: "images/jinfeng.png", stats: [60, 70, 20, 40, 50],
+            desc: "个头虽小，但杀伤力和逼格直接拉满。你是大马榴莲里的极致白月光，外表看起来苍白柔弱、与世无争，实则内心清醒独立，拥有极其坚定的内核，绝不随波逐流。你有着非常严重的精神洁癖、审美品癖和强迫症，打心眼里看不起那些花里胡哨的“网红爆款”和随波逐流的“大众脸”。你的傲慢不是写在脸上大喊大叫的，而是渗入骨髓的疏离感。你只有在遇到真正懂行、品味相投的极少数人面前，才会卸下防备，展现你令人惊叹的细腻、黏糯与丰富的灵魂层次。",
+            advice: "放下你的身段吧，别再端着那个不存在的清高贵族架子了。偶尔允许自己不完美，去体验一下粗糙但真实热烈的凡人快乐。水至清则无鱼，太挑剔只会让你孤独终老。"
+        },
+        SHOW: {
+            name: "红虾", tag: "SHOW (狂野显眼包)", imgSrc: "images/hongxia.png", stats: [50, 5, 100, 30, 70],
+            desc: "大马榴莲界的神金，不顾他人死活的绝世显眼包！别人都是内敛的黄色，你非要长成极其嚣张的橘红色。走到哪里，你都必须是全场最亮的那个崽，只要有一分钟没人看着你、没人给你点赞，你就会感到严重的窒息并原地发疯。你是行走的弹幕制造机，自带超大分贝的BGM，每天的精神状态就像是喝了三斤假酒一样亢奋。你用极度夸张、抓马的言行来掩饰内心深处偶尔的一丝空虚，你的人生哲学就是绝对纯粹的‘只要我不尴尬，尴尬的就是全世界’。",
+            advice: "收敛一点，拜托了！求求你把你的音量键调低两格。你的狂野和聒噪有时会让周围的内向型（i人）朋友感到严重的缺氧甚至心梗。深呼吸，试着安静五分钟，学学怎么做一个迷人的反派配角好吗？"
+        },
+        RARE: {
+            name: "朱雀", tag: "RARE (绝版神秘客)", imgSrc: "images/zhuque.png", stats: [40, 60, 50, 50, 90],
+            desc: "神出鬼没的传说级物种，精神状态遥遥领先地球人几个世纪。你的行为轨迹和脑回路毫无逻辑可言，完全取决于玄学、星象和当天早上的第一口空气。你极度讨厌无聊、讨厌被定义、讨厌一成不变，你的思维跳跃得像是在外太空打滚。别人根本猜不透你在想什么，因为连你自己都不知道下一秒会干出什么毁天灭地的蠢事。你是个拥有绝对有趣灵魂的奇葩，能给人带来极致的新鲜感，但不得不说，和你做朋友或者谈恋爱，真的很费脑细胞和心脏起搏器。",
+            advice: "求求你建立一点哪怕是三天的微观人生规划吧！不要总是凭直觉和投硬币做事。你的随性和跳跃虽然可爱且迷人，但也请稍微看看周围那些正在帮你收拾烂摊子的地球人的死活啊！"
+        },
+        HEAL: {
+            name: "葫芦", tag: "HEAL (微醺治愈系)", imgSrc: "images/hulu.png", stats: [20, 50, 30, 80, 10],
+            desc: "榴莲界的和平大使和万能备胎。你的果肉带点微苦的巧克力酒香，性格温吞且包容，是所有人最完美的树洞和知心人。你极度害怕冲突和尴尬，别人让你干嘛你就干嘛，几乎没有极端的棱角。你总是试图用牺牲自己底线的方式去讨好所有人，结果经常被身边的渣男渣女当成免费的情绪垃圾桶和工具人。你表面上总是在微笑着治愈别人，但一到深夜，你就会因为白天别人一句无心的话或者自己没发挥好的微小细节，陷入疯狂的内耗和自我折磨中。",
+            advice: "给自己长点防身的刺吧！你的善良必须带点锋芒，否则就是软弱。别谁来都能往你这里倒苦水，试着挺起胸膛，用最大的声音对那些吸血鬼喊一句‘关我屁事，滚！’。今天只为自己活一次！"
+        },
+        REBEL: {
+            name: "竹脚", tag: "REBEL (硬核反骨仔)", imgSrc: "images/zhujiao.png", stats: [80, 40, 70, 10, 100],
+            desc: "果肉中间带有一条极其显眼的排骨缝，这也象征着你极度清晰的界限感和防备心！你天生自带重达一百斤的反骨，专治社会上的各种虚伪和不服。只要是主流喜欢的东西你一律讨厌，只要是大众推崇的规矩你偏要打破，永远在和世界唱反调。你的脾气火爆且耿直，遇到看不惯的事情绝对当场发飙，绝不隔夜。你爱憎极其分明，眼里容不下一粒沙子，你不是正在和别人抬杠，就是在寻找更完美的杠杆准备撬动地球。",
+            advice: "把你身上那些尖锐的刺稍微磨平一点点，世界并不是一个巨大的针对你的阴谋。偶尔试着去赞同一下别人的观点，你会惊奇地发现，原来顺从一次真的不会要了你的命，反而能让你活得轻松很多。"
+        },
+        CHILL: {
+            name: "XO", tag: "CHILL (颓废艺术家)", imgSrc: "images/xo.png", stats: [10, 60, 20, 100, 40],
+            desc: "自带陈年发酵酒香的软烂肉质，主打一个看透红尘后的极致松弛感（或者说是摆烂）。你就是个活在自己世界里的颓废艺术家，人生最高格言是“算了吧”、“毁灭吧”、“我都行”。你极其讨厌现代社会的内卷，秉持着能躺着绝不坐着、能明天做绝不今天做的原则。面对生活中的重拳出击和各种PUA，你的终极应对策略是：直接闭上眼原地躺平睡一觉。只要你睡着了，整个世界的烦恼就与你无关，第二天醒来你依然是个快乐的废物。",
+            advice: "稍微支棱起来一点吧！松弛感如果掌握不好火候，那叫纯纯的懒癌晚期。不要拿颓废当借口掩饰你的拖延症。今天至少把堆在椅子上半个月没洗的衣服收一下，好吗？算我求你了！"
+        }
+    };
+
+    let currentQuestion = 0;
+    let userChoices = []; 
+
+    function startTest() {
+        userChoices = [];
+        currentQuestion = 0;
+        document.getElementById('home').classList.add('hidden');
+        document.getElementById('quiz').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = questions[currentQuestion];
+        document.getElementById('question-text').innerText = q.text;
+        document.getElementById('progress-text').innerText = `${currentQuestion + 1} / ${questions.length}`;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-option';
+            btn.innerText = opt.text;
+            btn.onclick = () => selectOption(opt.type);
+            optionsDiv.appendChild(btn);
+        });
+        
+        document.getElementById('progress').style.width = `${((currentQuestion) / questions.length) * 100}%`;
+
+        const prevBtn = document.getElementById('btn-prev');
+        if (currentQuestion > 0) {
+            prevBtn.classList.remove('hidden');
+        } else {
+            prevBtn.classList.add('hidden');
+        }
+    }
+
+    function selectOption(type) {
+        userChoices[currentQuestion] = type;
+        currentQuestion++;
+        
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            document.getElementById('progress').style.width = `100%`;
+            showLoading();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            showQuestion();
+        }
+    }
+
+    function showLoading() {
+        document.getElementById('quiz').classList.add('hidden');
+        const loadingScreen = document.getElementById('loading-screen');
+        loadingScreen.classList.add('active');
+        
+        initNebulaEffect();
+        
+        setTimeout(() => {
+            loadingScreen.classList.remove('active');
+            setTimeout(showResult, 500); 
+        }, 3500);
+    }
+
+    function drawRadarChart(stats) {
+        const canvas = document.getElementById('radarChart');
+        const ctx = canvas.getContext('2d');
+        
+        // --- 核心修复区：解决 Canvas 高清屏模糊问题 ---
+        const dpr = window.devicePixelRatio || 1;
+        const cssWidth = 300;
+        const cssHeight = 280;
+        
+        // 将 canvas 实际像素按 dpr 放大
+        canvas.width = cssWidth * dpr;
+        canvas.height = cssHeight * dpr;
+        
+        // 缩放上下文体系，保证后续绘制逻辑不需要改数字
+        ctx.scale(dpr, dpr);
+        // ------------------------------------------------
+        
+        const centerX = cssWidth / 2;
+        const centerY = cssHeight / 2 + 10;
+        const radius = 90;
+        const sides = 5;
+        const labels = ['控制欲', '社恐度', '戏精值', '松弛感', '反骨值'];
+        
+        ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+        // 绘制背景蛛网 (改成了虚线，更高级)
+        ctx.strokeStyle = 'rgba(230, 194, 0, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]); // 虚线效果
+        for (let level = 1; level <= 4; level++) {
+            let r = radius * (level / 4);
+            ctx.beginPath();
+            for (let i = 0; i < sides; i++) {
+                let angle = (Math.PI * 2 / sides) * i - Math.PI / 2;
+                let x = centerX + r * Math.cos(angle);
+                let y = centerY + r * Math.sin(angle);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+        ctx.setLineDash([]); // 恢复实线
+
+        // 绘制轴线
+        ctx.strokeStyle = 'rgba(230, 194, 0, 0.5)';
+        for (let i = 0; i < sides; i++) {
+            let angle = (Math.PI * 2 / sides) * i - Math.PI / 2;
+            let x = centerX + radius * Math.cos(angle);
+            let y = centerY + radius * Math.sin(angle);
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        }
+
+// ================= 开始替换：绘制文字 =================
+        // 绘制文字 (字号加大、极黑字体、增加白色描边防干扰)
+        ctx.font = '900 14px "PingFang SC", "Microsoft YaHei", sans-serif'; 
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        for (let i = 0; i < sides; i++) {
+            let angle = (Math.PI * 2 / sides) * i - Math.PI / 2;
+            
+            // 稍微拉开一点文字和蜘蛛网的距离，避免拥挤
+            let labelX = centerX + (radius + 32) * Math.cos(angle);
+            let labelY = centerY + (radius + 26) * Math.sin(angle);
+
+            // 1. 先绘制一圈较粗的白色底边 (Halo 光晕效果)
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 4; // 白边的粗细
+            ctx.lineJoin = 'round'; // 让文字边缘的白边更圆润平滑
+            ctx.strokeText(labels[i], labelX, labelY);
+
+            // 2. 再绘制纯黑色的文字实体 (最高对比度)
+            ctx.fillStyle = '#000000'; 
+            ctx.fillText(labels[i], labelX, labelY);
+        }
+        // ================= 替换结束 =================
+
+        // 绘制数据填充区
+        ctx.beginPath();
+        for (let i = 0; i < sides; i++) {
+            let angle = (Math.PI * 2 / sides) * i - Math.PI / 2;
+            let value = stats[i] || 0;
+            let r = radius * (value / 100);
+            let x = centerX + r * Math.cos(angle);
+            let y = centerY + r * Math.sin(angle);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        
+        // 增加数据区径向渐变，更有层次感
+        let gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+        gradient.addColorStop(0, 'rgba(255, 223, 0, 0.3)');
+        gradient.addColorStop(1, 'rgba(212, 175, 55, 0.6)');
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        
+        // 数据区外边框加粗
+        ctx.strokeStyle = '#D4AF37';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        
+        // 绘制数据圆点
+        ctx.fillStyle = '#1A1A1A';
+        for (let i = 0; i < sides; i++) {
+            let angle = (Math.PI * 2 / sides) * i - Math.PI / 2;
+            let value = stats[i] || 0;
+            let r = radius * (value / 100);
+            let x = centerX + r * Math.cos(angle);
+            let y = centerY + r * Math.sin(angle);
+            ctx.beginPath();
+            ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+            // 给黑点加个金边
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('result').classList.remove('hidden');
+        
+        let typeScores = { BOSS: 0, DARK: 0, PURE: 0, SHOW: 0, RARE: 0, HEAL: 0, REBEL: 0, CHILL: 0 };
+        for (let i = 0; i < userChoices.length; i++) {
+            let type = userChoices[i];
+            if (typeScores[type] !== undefined) {
+                typeScores[type]++;
+            }
+        }
+        
+        let priorityArray = ['BOSS', 'DARK', 'PURE', 'SHOW', 'RARE', 'HEAL', 'REBEL', 'CHILL'];
+        let maxScore = -1;
+        let finalType = 'HEAL'; 
+        
+        for (let i = 0; i < priorityArray.length; i++) {
+            let type = priorityArray[i];
+            if (typeScores[type] > maxScore) { 
+                maxScore = typeScores[type]; 
+                finalType = type; 
+            }
+        }
+        
+        const res = resultsData[finalType];
+        
+        document.getElementById('res-icon-container').innerHTML = `<img src="${res.imgSrc}" alt="${res.name}" class="mascot-img">`;
+        document.getElementById('res-name').innerText = res.name;
+        document.getElementById('res-tag').innerText = res.tag;
+        document.getElementById('res-desc').innerHTML = res.desc;
+        document.getElementById('res-advice').innerText = res.advice;
+        
+        setTimeout(() => {
+            drawRadarChart(res.stats);
+        }, 100);
+    }
+
+    function restart() {
+        document.getElementById('result').classList.add('hidden');
+        document.getElementById('home').classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
